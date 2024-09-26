@@ -49,6 +49,18 @@ const config: Config = {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
+  			},
+  			'pastel-purple': {
+  				'50': 'hsl(var(--pastel-purple-50))',
+  				'100': 'hsl(var(--pastel-purple-100))',
+  				'200': 'hsl(var(--pastel-purple-200))',
+  				'300': 'hsl(var(--pastel-purple-300))',
+  				'400': 'hsl(var(--pastel-purple-400))',
+  				'500': 'hsl(var(--pastel-purple-500))',
+  				'600': 'hsl(var(--pastel-purple-600))',
+  				'700': 'hsl(var(--pastel-purple-700))',
+  				'800': 'hsl(var(--pastel-purple-800))',
+  				'900': 'hsl(var(--pastel-purple-900))',
   			}
   		},
   		borderRadius: {

@@ -39,6 +39,16 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --pastel-purple-50: 270 100% 97%;
+    --pastel-purple-100: 270 100% 94%;
+    --pastel-purple-200: 270 100% 88%;
+    --pastel-purple-300: 270 100% 82%;
+    --pastel-purple-400: 270 100% 76%;
+    --pastel-purple-500: 270 100% 70%;
+    --pastel-purple-600: 270 100% 64%;
+    --pastel-purple-700: 270 100% 58%;
+    --pastel-purple-800: 270 100% 52%;
+    --pastel-purple-900: 270 100% 46%;
   }
   .dark {
     --background: 222.2 84% 4.9%;
