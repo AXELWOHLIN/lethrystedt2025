@@ -94,6 +94,10 @@ export function RsvpSida() {
         <Input id={`guest-name-${index}`} name={`guest-name-${index}`} required />
       </div>
       <div className="space-y-2">
+        <Label htmlFor={`guest-email-${index}`}>E-post</Label>
+        <Input id={`guest-email-${index}`} name={`guest-email-${index}`} type="email" required />
+      </div>
+      <div className="space-y-2">
         <Label htmlFor={`guest-specialkost-${index}`}>Specialkost</Label>
         <Textarea id={`guest-specialkost-${index}`} name={`guest-specialkost-${index}`} placeholder="Ange eventuella matpreferenser eller allergier" />
       </div>
@@ -119,7 +123,7 @@ export function RsvpSida() {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col items-center justify-center min-h-screen bg-pastel-purple-50"
+        className="flex flex-col items-center justify-center min-h-screen bg-pastel-purple-50 rounded-lg"
       >
         <Image
           src="/Inbjudan_bild.png"
