@@ -123,7 +123,8 @@ export function RsvpSida() {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="flex flex-col items-center justify-center min-h-screen bg-pastel-purple-50 rounded-lg"
+        className="flex flex-col items-center justify-center min-h-screen bg-white rounded-lg"
+        style={{ fontFamily: 'Centaur', color: 'black' }}
       >
         <Image
           src="/Inbjudan_bild.png"
@@ -132,13 +133,13 @@ export function RsvpSida() {
           height={600}
           className="mb-8"
         />
-        <h2 className="text-3xl font-bold text-pastel-purple-800">Tack för din anmälan</h2>
+        <h2 className="text-3xl font-bold">Tack för din anmälan</h2>
       </motion.div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-pastel-purple-50 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4" style={{ fontFamily: 'Centaur', color: 'black' }}>
       <motion.div 
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -156,9 +157,9 @@ export function RsvpSida() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          className="text-3xl font-bold text-center mb-6 text-pastel-purple-400 bg-pastel-purple-50 bg-opacity-200 p-4 rounded-lg"
+          className="text-3xl font-bold text-center mb-6"
         >
-          Bröllops RSVP
+          Vi ska gifta oss!
         </motion.h1>
         <motion.form 
           onSubmit={handleSubmit} 
