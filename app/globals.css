@@ -12,6 +12,11 @@ body {
   }
 }
 
+  /* In your CSS file */
+  .custom-small-text {
+    font-size: 0.8rem; /* Adjust the value as needed */
+  }
+
 @layer base {
   :root {
     --background: 0 0% 100%;

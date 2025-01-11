@@ -17,6 +17,11 @@ export function RsvpSida() {
   const [additionalGuests, setAdditionalGuests] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isAttending, setIsAttending] = useState(false) // Default to false for "Nej"
+
+  const handleAttendanceChange = (value: string) => {
+    setIsAttending(value === 'ja')
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -33,6 +38,7 @@ export function RsvpSida() {
         email: formData.get('email') as string || '',
         boende: formData.get('boende') as string || '',
         specialkost: formData.get('specialkost') as string || '',
+        ovrigt: formData.get('ovrigt') as string || '',
         isMainRespondent: true,
         timestamp: new Date(),
       }
@@ -56,6 +62,7 @@ export function RsvpSida() {
           boende: formData.get(`guest-boende-${i}`) as string || '',
           isMainRespondent: false,
           email: mainRespondent.email,
+          ovrigt: mainRespondent.ovrigt,
           timestamp: new Date(),
         }
 
@@ -94,16 +101,12 @@ export function RsvpSida() {
         <Input id={`guest-name-${index}`} name={`guest-name-${index}`} required />
       </div>
       <div className="space-y-2">
-        <Label htmlFor={`guest-email-${index}`}>E-post</Label>
-        <Input id={`guest-email-${index}`} name={`guest-email-${index}`} type="email" required />
-      </div>
-      <div className="space-y-2">
         <Label htmlFor={`guest-specialkost-${index}`}>Specialkost</Label>
         <Textarea id={`guest-specialkost-${index}`} name={`guest-specialkost-${index}`} placeholder="Ange eventuella matpreferenser eller allergier" />
       </div>
       <div className="space-y-2">
-        <Label>Behöver boende?</Label>
-        <RadioGroup defaultValue="nej" name={`guest-boende-${index}`} className="flex space-x-4">
+        <Label>Behövs boende?</Label>
+        <RadioGroup name={`guest-boende-${index}`} className="flex space-x-4">
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="ja" id={`guest-boende-ja-${index}`} />
             <Label htmlFor={`guest-boende-ja-${index}`}>Ja</Label>
@@ -146,55 +149,90 @@ export function RsvpSida() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md bg-white rounded-lg shadow-md p-8"
       >
-          <Image
-            src="/Anteckning_18_mars_2024.PNG"
-            alt="Emil & Mathilda"
-            width={400}
-            height={200}
-            className="object-contain"
-          />
+        <Image
+          src="/Anteckning_18_mars_2024.PNG"
+          alt="Emil & Mathilda"
+          width={400}
+          height={200}
+          className="object-contain"
+        />
         <motion.h1 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
           className="text-3xl font-bold text-center mb-6"
         >
-          Vi ska gifta oss!
+          Välkommen på bröllop!
+          <p className="text-base text-center">Emil & Mathilda</p>
+          <p className="text-sm text-center">-- Helgen 7-8 juni 2025 --</p>
+          <p className="text-sm text-center">Vi ser fram emot att få fira de här dagarna med er!</p>
         </motion.h1>
-        <motion.form 
-          onSubmit={handleSubmit} 
-          className="space-y-6"
-        >
-          <Input name="name" placeholder="Namn" required />
-          <Input name="email" type="email" placeholder="E-post" required />
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label>Behöver boende?</Label>
-            <RadioGroup defaultValue="nej" name="boende" className="flex space-x-4">
+            <Label htmlFor="name"><strong>Namn</strong></Label>
+            <Input name="name" placeholder="Namn" required className="mt-4 mb-4" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email"><strong>E-post</strong></Label>
+            <Input name="email" type="email" placeholder="E-post" required className="mb-4" />
+          </div>
+          <div className="space-y-2">
+            <Label><strong>Kommer du?</strong></Label>
+            <RadioGroup name="kommer-du" className="flex space-x-4" onValueChange={handleAttendanceChange}>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="ja" id="boende-ja" />
-                <Label htmlFor="boende-ja">Ja</Label>
+                <RadioGroupItem value="ja" id="kommer-du-ja" />
+                <Label htmlFor="kommer-du-ja">Ja</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="nej" id="boende-nej" />
-                <Label htmlFor="boende-nej">Nej</Label>
+                <RadioGroupItem value="nej" id="kommer-du-nej" />
+                <Label htmlFor="kommer-du-nej">Nej</Label>
               </div>
             </RadioGroup>
           </div>
-          <Textarea name="specialkost" placeholder="Ange eventuella matpreferenser eller allergier" />
+          {isAttending && (
+            <>
+              <div className="space-y-2 mt-4">
+                <Label><strong>Behöver du boende?</strong></Label>
+                <p className="custom-small-text">
+                  Boende omkring Marby är begränsat. Vi har ordnat med enklare boende på eller i
+                  närheten av Marby för alla gäster som önskar till ett självkostnadspris. Mer info
+                  kommer efter OSA
+                </p>
+                <RadioGroup name="boende" className="flex space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="ja" id="boende-ja" />
+                    <Label htmlFor="boende-ja">Ja, gärna!</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="nej" id="boende-nej" />
+                    <Label htmlFor="boende-nej">Nej, jag behöver inte/jag fixar eget.</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="specialkost"><strong>Har du några allergier eller matpreferenser?</strong></Label>
+                <Textarea name="specialkost" placeholder="Ange eventuella matpreferenser eller allergier" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="additional-guests">Vill du anmäla någon till?</Label>
+                <Select onValueChange={(value) => setAdditionalGuests(Number(value))}>
+                  <SelectTrigger id="additional-guests">
+                    <SelectValue placeholder="Välj antal" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[0, 1, 2, 3, 4].map((option) => (
+                      <SelectItem key={option} value={option.toString()}>{option}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {[...Array(additionalGuests)].map((_, index) => renderAdditionalGuestFields(index))}
+            </>
+          )}
           <div className="space-y-2">
-            <Label htmlFor="additional-guests">Vill du anmäla någon till?</Label>
-            <Select onValueChange={(value) => setAdditionalGuests(Number(value))}>
-              <SelectTrigger id="additional-guests">
-                <SelectValue placeholder="Välj antal" />
-              </SelectTrigger>
-              <SelectContent>
-                {[0, 1, 2, 3, 4].map((option) => (
-                  <SelectItem key={option} value={option.toString()}>{option}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label htmlFor="ovrigt"><strong>Övriga kommentarer eller önskemål</strong></Label>
+            <Textarea name="ovrigt" placeholder="Ange övriga kommentarer eller önskemål" />
           </div>
-          {[...Array(additionalGuests)].map((_, index) => renderAdditionalGuestFields(index))}
           {error && (
             <motion.div
               initial={{ opacity: 0 }}
@@ -214,10 +252,10 @@ export function RsvpSida() {
               className="w-full bg-pastel-purple-500 hover:bg-pastel-purple-600 text-white"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Skickar...' : 'Skicka RSVP'}
+              {isSubmitting ? 'Skickar...' : 'SKICKA SVAR'}
             </Button>
           </motion.div>
-        </motion.form>
+        </form>
       </motion.div>
     </div>
   )
