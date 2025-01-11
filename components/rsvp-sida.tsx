@@ -164,8 +164,9 @@ export function RsvpSida() {
         >
           Välkommen på bröllop!
           <p className="text-base text-center">Emil & Mathilda</p>
-          <p className="text-sm text-center">-- Helgen 7-8 juni 2025 --</p>
+          <p className="text-sm text-center"> Helgen 7-8 juni 2025</p>
           <p className="text-sm text-center">Vi ser fram emot att få fira de här dagarna med er!</p>
+          <p className="text-sm text-center">Vänligen OSA nedan för varje person som kommer</p>
         </motion.h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
