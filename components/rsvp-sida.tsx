@@ -36,6 +36,7 @@ export function RsvpSida() {
       const mainRespondent = {
         name: formData.get('name') as string || '',
         email: formData.get('email') as string || '',
+        kommer: formData.get('kommer-du') as string || '',
         boende: formData.get('boende') as string || '',
         specialkost: formData.get('specialkost') as string || '',
         ovrigt: formData.get('ovrigt') as string || '',
@@ -58,6 +59,7 @@ export function RsvpSida() {
       for (let i = 0; i < additionalGuests; i++) {
         const additionalGuest = {
           name: formData.get(`guest-name-${i}`) as string || '',
+          kommer: formData.get('kommer-du') as string || '',
           specialkost: formData.get(`guest-specialkost-${i}`) as string || '',
           boende: formData.get(`guest-boende-${i}`) as string || '',
           isMainRespondent: false,
@@ -163,10 +165,10 @@ export function RsvpSida() {
           className="text-3xl font-bold text-center mb-6"
         >
           Välkommen på bröllop!
-          <p className="text-base text-center">Emil & Mathilda</p>
-          <p className="text-sm text-center"> Helgen 7-8 juni 2025</p>
-          <p className="text-sm text-center">Vi ser fram emot att få fira de här dagarna med er!</p>
-          <p className="text-sm text-center">Vänligen OSA nedan för varje person som kommer</p>
+          <p className="text-base font-normal text-center">EMIL & MATHILDA</p>
+          <p className="text-sm font-normal text-center">~ HELGEN 7-8 JUNI, 2025 ~</p>
+          <p className="text-sm font-normal text-center -mb-1.5">Vi ser fram emot att få fira de här dagarna med er!</p>
+          <p className="text-sm font-normal text-center -mb-3">Vänligen OSA nedan för varje person som kommer</p>
         </motion.h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
@@ -182,11 +184,11 @@ export function RsvpSida() {
             <RadioGroup name="kommer-du" className="flex space-x-4" onValueChange={handleAttendanceChange}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="ja" id="kommer-du-ja" />
-                <Label htmlFor="kommer-du-ja">Ja</Label>
+                <Label htmlFor="kommer-du-ja">Ja, såklart!</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="nej" id="kommer-du-nej" />
-                <Label htmlFor="kommer-du-nej">Nej</Label>
+                <Label htmlFor="kommer-du-nej">Nej, tyvärr...</Label>
               </div>
             </RadioGroup>
           </div>
@@ -215,7 +217,7 @@ export function RsvpSida() {
                 <Textarea name="specialkost" placeholder="Ange eventuella matpreferenser eller allergier" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="additional-guests">Vill du anmäla någon till?</Label>
+                <Label htmlFor="additional-guests"><strong>Vill du anmäla ytterligare gäster?</strong></Label>
                 <Select onValueChange={(value) => setAdditionalGuests(Number(value))}>
                   <SelectTrigger id="additional-guests">
                     <SelectValue placeholder="Välj antal" />
@@ -250,7 +252,7 @@ export function RsvpSida() {
           >
             <Button 
               type="submit" 
-              className="w-full bg-pastel-purple-500 hover:bg-pastel-purple-600 text-white"
+              className="w-full bg-[#9da08b] hover:bg-[#8a8d7a] text-white"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Skickar...' : 'SKICKA SVAR'}
