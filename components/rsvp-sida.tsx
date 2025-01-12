@@ -30,22 +30,26 @@ export function RsvpSida() {
 
     const form = event.currentTarget
     const formData = new FormData(form)
-
+    
     try {
       // Main respondent data
+      const kommer = formData.get('kommer-du') as string
+      
+      // Validate kommer field
+      if (!kommer) {
+        throw new Error('Du måste välja om du kommer eller inte.')
+      }
+
       const mainRespondent = {
         name: formData.get('name') as string || '',
         email: formData.get('email') as string || '',
-        kommer: formData.get('kommer-du') as string || '',
+        kommer: kommer, // Ensure kommer is included
         boende: formData.get('boende') as string || '',
         specialkost: formData.get('specialkost') as string || '',
         ovrigt: formData.get('ovrigt') as string || '',
         isMainRespondent: true,
         timestamp: new Date(),
       }
-
-      // Log the main respondent data for debugging
-      console.log('Main Respondent Data:', mainRespondent)
 
       // Check if required fields are filled
       if (!mainRespondent.name || !mainRespondent.email) {
@@ -181,7 +185,12 @@ export function RsvpSida() {
           </div>
           <div className="space-y-2">
             <Label><strong>Kommer du?</strong></Label>
-            <RadioGroup name="kommer-du" className="flex space-x-4" onValueChange={handleAttendanceChange}>
+            <RadioGroup 
+              name="kommer-du" 
+              className="flex space-x-4" 
+              onValueChange={handleAttendanceChange}
+              required
+            >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="ja" id="kommer-du-ja" />
                 <Label htmlFor="kommer-du-ja">Ja, såklart!</Label>
