@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,8 +19,78 @@ export function RsvpSida() {
   const [error, setError] = useState<string | null>(null)
   const [isAttending, setIsAttending] = useState(false) // Default to false for "Nej"
 
+  // State for managing the main guest's email
+  const [mainEmail, setMainEmail] = useState<string>('')
+
+  // State for managing additional guests' emails
+  const [guestEmails, setGuestEmails] = useState<string[]>([])
+
+  // State to track which guests are using the primary email
+  const [usingPrimaryEmail, setUsingPrimaryEmail] = useState<boolean[]>([])
+
+  // Initialize guestEmails and usingPrimaryEmail arrays based on additionalGuests
+  useEffect(() => {
+    setGuestEmails((prevEmails) => {
+      const newEmails = [...prevEmails]
+      while (newEmails.length < additionalGuests) {
+        newEmails.push('')
+      }
+      while (newEmails.length > additionalGuests) {
+        newEmails.pop()
+      }
+      return newEmails
+    })
+    setUsingPrimaryEmail((prev) => {
+      const newUsing = [...prev]
+      while (newUsing.length < additionalGuests) {
+        newUsing.push(false)
+      }
+      while (newUsing.length > additionalGuests) {
+        newUsing.pop()
+      }
+      return newUsing
+    })
+  }, [additionalGuests])
+
+  // Update guestEmails when mainEmail changes for guests using primary email
+  useEffect(() => {
+    setGuestEmails((prevEmails) => {
+      const updatedEmails = [...prevEmails]
+      usingPrimaryEmail.forEach((usePrimary, index) => {
+        if (usePrimary) {
+          updatedEmails[index] = mainEmail
+        }
+      })
+      return updatedEmails
+    })
+  }, [mainEmail, usingPrimaryEmail])
+
+  const handleGuestEmailChange = (index: number, email: string) => {
+    const updatedEmails = [...guestEmails]
+    updatedEmails[index] = email
+    setGuestEmails(updatedEmails)
+  }
+
+  const handleUsePrimaryEmail = (index: number, usePrimary: boolean) => {
+    const updatedUsingPrimary = [...usingPrimaryEmail]
+    updatedUsingPrimary[index] = usePrimary
+    setUsingPrimaryEmail(updatedUsingPrimary)
+
+    const updatedEmails = [...guestEmails]
+    if (usePrimary) {
+      updatedEmails[index] = mainEmail
+    } else {
+      updatedEmails[index] = ''
+    }
+    setGuestEmails(updatedEmails)
+  }
+
   const handleAttendanceChange = (value: string) => {
     setIsAttending(value === 'ja')
+  }
+
+  const handleMainEmailChange = (email: string) => {
+    setMainEmail(email)
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -30,23 +100,25 @@ export function RsvpSida() {
 
     const form = event.currentTarget
     const formData = new FormData(form)
-    
+
     try {
       // Main respondent data
       const kommer = formData.get('kommer-du') as string
-      
+
       // Validate kommer field
       if (!kommer) {
         throw new Error('Du måste välja om du kommer eller inte.')
       }
 
+      const primaryEmail = mainEmail.trim()
+
       const mainRespondent = {
-        name: formData.get('name') as string || '',
-        email: formData.get('email') as string || '',
+        name: (formData.get('name') as string)?.trim() || '',
+        email: primaryEmail,
         kommer: kommer, // Ensure kommer is included
-        boende: formData.get('boende') as string || '',
-        specialkost: formData.get('specialkost') as string || '',
-        ovrigt: formData.get('ovrigt') as string || '',
+        boende: (formData.get('boende') as string)?.trim() || '',
+        specialkost: (formData.get('specialkost') as string)?.trim() || '',
+        ovrigt: (formData.get('ovrigt') as string)?.trim() || '',
         isMainRespondent: true,
         timestamp: new Date(),
       }
@@ -61,14 +133,18 @@ export function RsvpSida() {
 
       // Handle additional guests
       for (let i = 0; i < additionalGuests; i++) {
+        const kommerGäst = formData.get(`kommer-du-${i}`) as string || '' // Adjusted field name for uniqueness
+
+        // Updated logic: Use mainEmail if usingPrimaryEmail[i] is true
+        const guestEmail = usingPrimaryEmail[i] ? mainEmail.trim() : (formData.get(`guest-email-${i}`) as string)?.trim() || ''
+
         const additionalGuest = {
-          name: formData.get(`guest-name-${i}`) as string || '',
-          kommer: formData.get('kommer-du') as string || '',
-          specialkost: formData.get(`guest-specialkost-${i}`) as string || '',
-          boende: formData.get(`guest-boende-${i}`) as string || '',
+          name: (formData.get(`guest-name-${i}`) as string)?.trim() || '',
+          email: guestEmail, // Use the determined email
+          kommer: kommer,
+          specialkost: (formData.get(`guest-specialkost-${i}`) as string)?.trim() || '',
+          boende: (formData.get(`guest-boende-${i}`) as string)?.trim() || '',
           isMainRespondent: false,
-          email: mainRespondent.email,
-          ovrigt: mainRespondent.ovrigt,
           timestamp: new Date(),
         }
 
@@ -78,6 +154,10 @@ export function RsvpSida() {
         // Check if required fields are filled
         if (!additionalGuest.name) {
           throw new Error(`Namn för ytterligare gäst ${i + 1} är obligatoriskt.`)
+        }
+
+        if (!additionalGuest.email) {
+          throw new Error(`E-post för ytterligare gäst ${i + 1} är obligatoriskt.`)
         }
 
         // Add additional guest to Firestore
@@ -104,11 +184,40 @@ export function RsvpSida() {
       <h3 className="font-semibold">Ytterligare gäst {index + 1}</h3>
       <div className="space-y-2">
         <Label htmlFor={`guest-name-${index}`}>Namn</Label>
-        <Input id={`guest-name-${index}`} name={`guest-name-${index}`} required />
+        <Input 
+          id={`guest-name-${index}`} 
+          name={`guest-name-${index}`} 
+          required 
+          placeholder="Namn"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor={`guest-email-${index}`}>E-post</Label>
+        <Input
+          id={`guest-email-${index}`}
+          name={`guest-email-${index}`}
+          placeholder="Ange e-post eller använd samma som huvudgästen"
+          value={guestEmails[index] || ''}
+          onChange={(e) => handleGuestEmailChange(index, e.target.value)}
+          disabled={usingPrimaryEmail[index]}
+        />
+        <div className="flex items-center space-x-2 mt-2">
+          <input
+            type="checkbox"
+            id={`use-primary-email-${index}`}
+            checked={usingPrimaryEmail[index]}
+            onChange={(e) => handleUsePrimaryEmail(index, e.target.checked)}
+          />
+          <Label htmlFor={`use-primary-email-${index}`}>Använd samma e-post som huvudgästen</Label>
+        </div>
       </div>
       <div className="space-y-2">
         <Label htmlFor={`guest-specialkost-${index}`}>Specialkost</Label>
-        <Textarea id={`guest-specialkost-${index}`} name={`guest-specialkost-${index}`} placeholder="Ange eventuella matpreferenser eller allergier" />
+        <Textarea
+          id={`guest-specialkost-${index}`}
+          name={`guest-specialkost-${index}`}
+          placeholder="Ange eventuella matpreferenser eller allergier"
+        />
       </div>
       <div className="space-y-2">
         <Label>Behövs boende?</Label>
@@ -177,11 +286,24 @@ export function RsvpSida() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="name"><strong>Namn</strong></Label>
-            <Input name="name" placeholder="Namn" required className="mt-4 mb-4" />
+            <Input 
+              name="name" 
+              placeholder="Namn" 
+              required 
+              className="mt-4 mb-4" 
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email"><strong>E-post</strong></Label>
-            <Input name="email" type="email" placeholder="E-post" required className="mb-4" />
+            <Input 
+              name="email" 
+              type="email" 
+              placeholder="E-post" 
+              required 
+              className="mb-4" 
+              value={mainEmail}
+              onChange={(e) => handleMainEmailChange(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label><strong>Kommer du?</strong></Label>
@@ -223,7 +345,10 @@ export function RsvpSida() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="specialkost"><strong>Har du några allergier eller matpreferenser?</strong></Label>
-                <Textarea name="specialkost" placeholder="Ange eventuella matpreferenser eller allergier" />
+                <Textarea 
+                  name="specialkost" 
+                  placeholder="Ange eventuella matpreferenser eller allergier" 
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="additional-guests"><strong>Vill du anmäla ytterligare gäster?</strong></Label>
@@ -243,7 +368,10 @@ export function RsvpSida() {
           )}
           <div className="space-y-2">
             <Label htmlFor="ovrigt"><strong>Övriga kommentarer eller önskemål</strong></Label>
-            <Textarea name="ovrigt" placeholder="Ange övriga kommentarer eller önskemål" />
+            <Textarea 
+              name="ovrigt" 
+              placeholder="Ange övriga kommentarer eller önskemål" 
+            />
           </div>
           {error && (
             <motion.div
