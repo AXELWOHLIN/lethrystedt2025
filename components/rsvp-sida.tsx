@@ -133,7 +133,6 @@ export function RsvpSida() {
 
       // Handle additional guests
       for (let i = 0; i < additionalGuests; i++) {
-        const kommerGäst = formData.get(`kommer-du-${i}`) as string || '' // Adjusted field name for uniqueness
 
         // Updated logic: Use mainEmail if usingPrimaryEmail[i] is true
         const guestEmail = usingPrimaryEmail[i] ? mainEmail.trim() : (formData.get(`guest-email-${i}`) as string)?.trim() || ''
